@@ -58,6 +58,9 @@ $ cmake -DDESC_CAP=8 -DPMEM_BACKEND=Volatile -DWITH_RTM=1 -DCMAKE_BUILD_TYPE=[De
 Under Linux the `volatile` and `emu` variants use a simple thread-local allocator that uses huge pages. Make sure the system has enough huge pages:
 ```
 sudo sh -c 'echo [x pages] > /proc/sys/vm/nr_hugepages'
+###JA:Start###
+sudo sh -c 'echo 6000 > /proc/sys/vm/nr_hugepages'
+###JA:End###
 ```
 By default the allocator needs ~10GB per socket, defined by `kNumaMemorySize` in [src/environment/environment_linux.h](./src/environment/environment_linux.h).
 
@@ -132,6 +135,7 @@ A sample 10-second, 2-thread, 100-entry array run that changes four words:
 $ mwcas_shm_server -shm_segment "mwcas" # start the shared memory process
 $ mwcas_benchmark -shm_segment "mwcas" -threads 2 -seconds 10 -array_size 100 -word_count 4
 ```
+JA: This seems to work only with -threads 1. Any more number of threads results in a core dump. Examining the core dump reveals problematic code at status::ok() in mwcas.h. [Yet to figure out the actual reasoning behind this error.]
 See the source file for  a complete list of parameters.
 
 ### Doubly-linked list
